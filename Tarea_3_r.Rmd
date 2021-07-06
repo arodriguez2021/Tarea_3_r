@@ -1,0 +1,108 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+---
+TAREA 3: INVESTIGACION
+---
+1)	 ¿Cómo leer un archivo CSV desde R?
+Para leer un archivo CSV (valores delimitados por un caracter) existen 2 funciones: read.csv y read.csv2, las cuales se pueden utilizar según la necesidad que se tenga.
+
+read.csv
+# Por defecto coma (,) como separador y punto (.) como separador decimal
+read.csv	(file,				# Nombre del archivo o ruta completa del archivo
+header = TRUE,		# Leer el encabezado (TRUE) o no (FALSE)
+sep = ",",			# Separador de los valores
+quote = "\"",		# Caracter de citaciones
+dec = ".",			# Punto decimal
+fill = TRUE,			# Rellenar celdas vacías (TRUE) o no (FALSE)
+comment.char = "",	# Carácter de los comentarios o cadenas vacías
+encoding = "unknown", # Codificación del archivo
+...)				# Argumentos adicionales
+
+	read.csv2
+# Por defecto punto y coma (;) como separador y coma (,) como separador decimal
+read.csv2	(file,				# Nombre del archivo o ruta completa del archivo
+header = TRUE,		# Leer el encabezado (TRUE) o no (FALSE)
+sep = ";",			# Separador de los valores
+quote = "\"",		# Caracter de citaciones
+dec = ",",			# Punto decimal
+fill = TRUE,			# Rellenar celdas vacías (TRUE) o no (FALSE)
+comment.char = "",	# Carácter de los comentarios o cadenas vacías
+encoding = "unknown", # Codificación del archivo
+...)				# Argumentos adicionales
+
+Básicamente la diferencia entre ambas instrucciones es el separador de campos y el separador de valores decimales. La siguiente tabla resume los tres argumentos predeterminados principales:
+
+Función	Header	Separador de campo	Separador de decimales
+read.csv	TRUE	“,”	“.”
+read.csv2	TRUE	“;”	“,”
+
+Para cargar un archivo CSV en R con los argumentos predeterminados puedes pasar el archivo como cadena de caracteres a la función correspondiente. La salida será una clase data frame
+
+<!-- read.csv(“archivo.csv”) -->
+
+2)	 Función select()
+select (.data, ColA, ColB, …) es una función de la librería dplyr que permite seleccionar una o un grupo de columnas de un objeto de clase .data (base de datos o data frame)
+
+<!-- miarchivo <- read.csv (“archivo.csv”) -->
+<!-- select (miarchivo, ColA, ColB, …) -->
+
+---
+TAREA 3: EJERCICIOS
+---
+```{r}
+library(dplyr)
+
+dataset_results <- read.csv("primary_results.csv")
+
+View(dataset_results)
+
+```
+<!-- 1) Filtrar todos los votos del estado de Florida -->
+```{r}
+dataset_results %>%
+  filter(state_abbreviation == "FL")
+
+```
+<!-- 2.1) Filtrar votos para los candidatos Hillary Clinton o Donald Trump -->
+```{r}
+dataset_results %>%
+  filter(candidate == "Hillary Clinton" | candidate == "Donald Trump")
+
+```
+<!-- 2.2) Filtrar votos para el partido Demócrata y el condado Shelby -->
+```{r}
+dataset_results %>%
+  filter(party == "Democrat" & county == "Shelby")
+
+```
+<!-- 2.3) Filtrar votos para el estado de Alabama y que la cantidad de votos sea mayor a
+15000 -->
+```{r}
+dataset_results %>%
+  filter(state_abbreviation == "AL" & votes > 15000)
+
+```
+<!-- 3.1) Filtrar votos para el estado de Texas y el condado Denton, seleccionando
+únicamente las columnas party, candidate, votes, luego ordene de forma
+descendente por la columna votes -->
+```{r}
+select(dataset_results %>%
+         filter(state_abbreviation == "TX" & county == "Denton"), party, candidate, votes) %>%
+  arrange(desc (votes))
+
+```
+<!-- 4.1) Filtrar por el partido Republicano, que el candidato sea Ted Cruz en el estado de
+Alaska, luego agregue una columna que se llame vote_count que sea la división de
+votes por fraction_votes (votes/fraction_votes), finalmente ordene de forma
+descendente por vote_count. -->
+```{r}
+dataset_results %>%
+  filter(party == "Republican" & candidate == "Ted Cruz" & state_abbreviation == "TX") %>%
+  mutate(vote_count = votes/fraction_votes) %>%
+  arrange(desc(vote_count))
+
+```
+
